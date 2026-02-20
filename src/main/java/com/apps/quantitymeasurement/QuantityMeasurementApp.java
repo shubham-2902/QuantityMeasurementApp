@@ -1,46 +1,61 @@
 package com.apps.quantitymeasurement;
 
+import java.util.Scanner;
+
 public class QuantityMeasurementApp {
 
-	// Inner class to represent Feet measurement
-	public static class Feet {
+    // Inner class to represent Feet measurement
+    public static class Feet {
 
-		private final double value;
+        private final double value;
 
-		// Constructor
-		public Feet(double value) {
-			this.value = value;
-		}
+        public Feet(double value) {
+            this.value = value;
+        }
 
-		// Override equals() to compare Feet objects
-		@Override
-		public boolean equals(Object obj) {
+        @Override
+        public boolean equals(Object obj) {
 
-			// Reference check (same object)
-			if (this == obj)
-				return true;
+            // Reference check
+            if (this == obj) return true;
 
-			// Null check
-			if (obj == null)
-				return false;
+            // Null check
+            if (obj == null) return false;
 
-			// Type check
-			if (getClass() != obj.getClass())
-				return false;
+            // Type check
+            if (getClass() != obj.getClass()) return false;
 
-			// Cast and value comparison
-			Feet other = (Feet) obj;
+            // Cast and compare values
+            Feet other = (Feet) obj;
 
-			return Double.compare(this.value, other.value) == 0;
-		}
-	}
+            return Double.compare(this.value, other.value) == 0;
+        }
+    }
 
-	// Optional main method for manual testing
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		Feet f1 = new Feet(1.0);
-		Feet f2 = new Feet(1.0);
+        Scanner sc = new Scanner(System.in);
 
-		System.out.println(f1.equals(f2)); // true
-	}
+        try {
+            System.out.print("Enter first value in feet: ");
+            double value1 = sc.nextDouble();
+
+            System.out.print("Enter second value in feet: ");
+            double value2 = sc.nextDouble();
+
+            Feet f1 = new Feet(value1);
+            Feet f2 = new Feet(value2);
+
+            if (f1.equals(f2)) {
+                System.out.println("Equal (true)");
+            } else {
+                System.out.println("Not Equal (false)");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Invalid input! Please enter numeric values.");
+        }
+
+        sc.close();
+    }
 }
