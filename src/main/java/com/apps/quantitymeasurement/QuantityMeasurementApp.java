@@ -2,7 +2,9 @@ package com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    // ---------- Equality ----------
+    
+    // EQUALITY DEMO
+    
     public static boolean demonstrateLengthEquality(
             Length length1, Length length2) {
 
@@ -16,7 +18,9 @@ public class QuantityMeasurementApp {
         return result;
     }
 
-    // ---------- Comparison ----------
+   
+    // COMPARISON USING VALUES
+    
     public static boolean demonstrateLengthComparison(
             double value1, Length.LengthUnit unit1,
             double value2, Length.LengthUnit unit2) {
@@ -27,7 +31,9 @@ public class QuantityMeasurementApp {
         return demonstrateLengthEquality(l1, l2);
     }
 
-    // ---------- Conversion ----------
+    
+    // CONVERSION DEMO
+    
     public static Length demonstrateLengthConversion(
             double value,
             Length.LengthUnit fromUnit,
@@ -44,6 +50,8 @@ public class QuantityMeasurementApp {
         return length.convertTo(toUnit);
     }
 
+  
+    // UC6 ADDITION DEMO
     
     public static Length demonstrateLengthAddition(
             Length length1, Length length2) {
@@ -55,14 +63,30 @@ public class QuantityMeasurementApp {
         return result;
     }
 
-    // ---------------- MAIN ----------------
+   
+    // UC7 ADDITION WITH TARGET UNIT ⭐
+  
+    public static Length demonstrateLengthAddition(
+            Length length1,
+            Length length2,
+            Length.LengthUnit targetUnit) {
+
+        Length result = length1.add(length2, targetUnit);
+
+        System.out.println("Sum = " + result);
+
+        return result;
+    }
+
+    
+    // MAIN METHOD 
+    
     public static void main(String[] args) {
 
-        // Example from UC6 description
         Length l1 = new Length(1.0, Length.LengthUnit.FEET);
         Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
 
-        demonstrateLengthAddition(l1, l2); // -> 2 FEET
-       
+        demonstrateLengthAddition(l1, l2); // UC6
+        demonstrateLengthAddition(l1, l2, Length.LengthUnit.YARDS); // UC7
     }
 }
