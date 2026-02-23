@@ -2,14 +2,21 @@ package com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    // ===== Equality check =====
+    // ---------- Equality ----------
     public static boolean demonstrateLengthEquality(
-            Length length1,
-            Length length2) {
-        return length1.equals(length2);
+            Length length1, Length length2) {
+
+        boolean result = length1.equals(length2);
+
+        if (result)
+            System.out.println("The two length measurements are equal.");
+        else
+            System.out.println("The two length measurements are not equal.");
+
+        return result;
     }
 
-    // ===== Comparison using values + units =====
+    // ---------- Comparison ----------
     public static boolean demonstrateLengthComparison(
             double value1, Length.LengthUnit unit1,
             double value2, Length.LengthUnit unit2) {
@@ -20,7 +27,7 @@ public class QuantityMeasurementApp {
         return demonstrateLengthEquality(l1, l2);
     }
 
-    // ===== UC5 Conversion Method (overloaded #1) =====
+    // ---------- Conversion ----------
     public static Length demonstrateLengthConversion(
             double value,
             Length.LengthUnit fromUnit,
@@ -30,7 +37,6 @@ public class QuantityMeasurementApp {
         return length.convertTo(toUnit);
     }
 
-    // ===== UC5 Conversion Method (overloaded #2) =====
     public static Length demonstrateLengthConversion(
             Length length,
             Length.LengthUnit toUnit) {
@@ -38,37 +44,25 @@ public class QuantityMeasurementApp {
         return length.convertTo(toUnit);
     }
 
-    // ===== MAIN METHOD (Demo Only) =====
+    
+    public static Length demonstrateLengthAddition(
+            Length length1, Length length2) {
+
+        Length result = length1.add(length2);
+
+        System.out.println("Sum = " + result);
+
+        return result;
+    }
+
+    // ---------------- MAIN ----------------
     public static void main(String[] args) {
 
-        // Example conversions
-        System.out.println(
-                demonstrateLengthConversion(
-                        1.0,
-                        Length.LengthUnit.FEET,
-                        Length.LengthUnit.INCHES));
+        // Example from UC6 description
+        Length l1 = new Length(1.0, Length.LengthUnit.FEET);
+        Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
 
-        System.out.println(
-                demonstrateLengthConversion(
-                        3.0,
-                        Length.LengthUnit.YARDS,
-                        Length.LengthUnit.FEET));
-
-        System.out.println(
-                demonstrateLengthConversion(
-                        36.0,
-                        Length.LengthUnit.INCHES,
-                        Length.LengthUnit.YARDS));
-
-        System.out.println(
-                demonstrateLengthConversion(
-                        1.0,
-                        Length.LengthUnit.CENTIMETERS,
-                        Length.LengthUnit.INCHES));
-        System.out.println(
-                demonstrateLengthConversion(
-                        0.0,
-                        Length.LengthUnit.FEET,
-                        Length.LengthUnit.INCHES));
+        demonstrateLengthAddition(l1, l2); // -> 2 FEET
+       
     }
 }
