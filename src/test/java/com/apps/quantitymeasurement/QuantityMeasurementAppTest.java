@@ -189,4 +189,29 @@ public class QuantityMeasurementAppTest {
             QuantityMeasurementApp.demonstrateLengthEquality(sumLength, expectedLength)
         );
     }
+    @Test
+    public void addFeetAndInchesWithTargetUnitInches() {
+
+        // Arrange
+        Length length1 = new Length(1.0, Length.LengthUnit.FEET);
+        Length length2 = new Length(12.0, Length.LengthUnit.INCHES);
+
+        // Act
+        Length sumLength = QuantityMeasurementApp
+                .demonstrateLengthAddition(
+                        length1,
+                        length2,
+                        Length.LengthUnit.INCHES);
+
+        // Expected: 1 foot + 12 inches = 24 inches
+        Length expectedLength =
+                new Length(24.0, Length.LengthUnit.INCHES);
+
+        // Assert
+        assertTrue(
+                QuantityMeasurementApp
+                        .demonstrateLengthEquality(
+                                sumLength,
+                                expectedLength));
+    }
 }
