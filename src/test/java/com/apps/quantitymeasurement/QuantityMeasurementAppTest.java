@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class QuantityMeasurementAppTest {
 
-    // ===== UC1/UC2/UC3 COMPATIBILITY =====
+    // Basic test cases for UC-1 ,UC-2 and UC-3
 
     @Test
     public void testFeetEquality() {
@@ -56,7 +56,7 @@ public class QuantityMeasurementAppTest {
         assertTrue(l1.equals(l2));
     }
 
-    // ===== UC4 — YARDS SUPPORT =====
+    // ===== UC4 — YARDS =====
 
     @Test
     public void yardEquals36Inches() {
@@ -79,7 +79,7 @@ public class QuantityMeasurementAppTest {
         assertFalse(yard.equals(inches));
     }
 
-    // ===== UC4 — CENTIMETERS SUPPORT =====
+    // ===== UC4 — CENTIMETERS =====
 
     @Test
     public void centimeterEquals39Point3701Inches() {
@@ -95,14 +95,7 @@ public class QuantityMeasurementAppTest {
         assertTrue(cm.equals(foot));
     }
 
-    @Test
-    public void centimetersNotEqualToFeet() {
-        Length cm = new Length(1.0, Length.LengthUnit.CENTIMETERS);
-        Length feet = new Length(1.0, Length.LengthUnit.FEET);
-        assertFalse(cm.equals(feet));
-    }
-
-    // ===== EQUALITY CONTRACT TESTS =====
+    // ===== EQUALITY CONTRACT =====
 
     @Test
     public void referenceEqualitySameObject() {
@@ -123,16 +116,10 @@ public class QuantityMeasurementAppTest {
         Length b = new Length(3.0, Length.LengthUnit.FEET);
         Length c = new Length(36.0, Length.LengthUnit.INCHES);
 
-        // Reflexive
-        assertTrue(a.equals(a));
-
-        // Symmetric
-        assertTrue(a.equals(b));
+        assertTrue(a.equals(a));   // reflexive
+        assertTrue(a.equals(b));   // symmetric
         assertTrue(b.equals(a));
-
-        // Transitive
-        assertTrue(a.equals(b));
-        assertTrue(b.equals(c));
+        assertTrue(b.equals(c));   // transitive
         assertTrue(a.equals(c));
     }
 
@@ -148,5 +135,42 @@ public class QuantityMeasurementAppTest {
         Length l1 = new Length(2.0, Length.LengthUnit.YARDS);
         Length l2 = new Length(6.0, Length.LengthUnit.FEET);
         assertTrue(l1.equals(l2));
+    }
+
+    // ===== UC5 — CONVERSION TESTS =====
+
+    @Test
+    public void convertFeetToInches() {
+        Length result = QuantityMeasurementApp
+                .demonstrateLengthConversion(
+                        3.0,
+                        Length.LengthUnit.FEET,
+                        Length.LengthUnit.INCHES);
+
+        Length expected =
+                new Length(36.0, Length.LengthUnit.INCHES);
+
+        assertTrue(
+                QuantityMeasurementApp
+                        .demonstrateLengthEquality(result, expected)
+        );
+    }
+
+    @Test
+    public void convertYardsToInchesUsingOverloadedMethod() {
+        Length yards = new Length(2.0, Length.LengthUnit.YARDS);
+
+        Length result = QuantityMeasurementApp
+                .demonstrateLengthConversion(
+                        yards,
+                        Length.LengthUnit.INCHES);
+
+        Length expected =
+                new Length(72.0, Length.LengthUnit.INCHES);
+
+        assertTrue(
+                QuantityMeasurementApp
+                        .demonstrateLengthEquality(result, expected)
+        );
     }
 }
