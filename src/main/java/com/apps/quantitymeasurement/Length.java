@@ -6,21 +6,17 @@ public class Length {
     private double value;
     private LengthUnit unit;
 
-    /**
-     * Enum representing supported length units.
-     * Conversion factors are relative to inches (base unit).
-     */
+    // ---------------- ENUM ----------------
     public enum LengthUnit {
-
-        FEET(12.0),            // 1 ft = 12 in
-        INCHES(1.0),           // base unit
-        YARDS(36.0),           // 1 yd = 36 in
-        CENTIMETERS(0.393701); // 1 cm = 0.393701 in
+        FEET(12.0),
+        INCHES(1.0),
+        YARDS(36.0),
+        CENTIMETERS(0.393701);
 
         private final double conversionFactor;
 
-        LengthUnit(double conversionFactor) {
-            this.conversionFactor = conversionFactor;
+        LengthUnit(double factor) {
+            this.conversionFactor = factor;
         }
 
         public double getConversionFactor() {
@@ -28,67 +24,68 @@ public class Length {
         }
     }
 
-    // Constructor
+    // ---------------- CONSTRUCTOR ----------------
     public Length(double value, LengthUnit unit) {
         this.value = value;
         this.unit = unit;
     }
 
-    // ===== Convert this length to base unit (inches) =====
+    // ---------------- BASE CONVERSION ----------------
     private double convertToBaseUnit() {
-        double baseValue = value * unit.getConversionFactor();
-        return Math.round(baseValue * 100.0) / 100.0; // round to 2 decimals
+
+        double inches = value * unit.getConversionFactor();
+
+        // ⭐ Round to 2 decimal places
+        return Math.round(inches * 100.0) / 100.0;
     }
 
-    // ===== Compare two Length objects =====
-    public boolean compare(Length thatLength) {
+    // ---------------- EQUALITY ----------------
+    private boolean compare(Length that) {
         return Double.compare(
                 this.convertToBaseUnit(),
-                thatLength.convertToBaseUnit()
-        ) == 0;
+                that.convertToBaseUnit()) == 0;
     }
 
-    // ===== equals override =====
     @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-
-        Length other = (Length) obj;
-        return compare(other);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Length that = (Length) o;
+        return compare(that);
     }
 
-    // =========================================================
-    // ===== UC5: CONVERSION FEATURE ===========================
-    // =========================================================
-
-    /**
-     * Convert this Length to a target unit.
-     * Returns a NEW Length object (immutability).
-     */
+    // ---------------- CONVERSION ----------------
     public Length convertTo(LengthUnit targetUnit) {
 
-        if (targetUnit == null) {
-            throw new IllegalArgumentException("Target unit cannot be null");
-        }
+        double baseValue = convertToBaseUnit();
 
-        // Convert to base unit first (inches)
-        double baseValue = this.value * this.unit.getConversionFactor();
-
-        // Convert base → target
         double convertedValue =
                 baseValue / targetUnit.getConversionFactor();
-
-        // Round to 2 decimals
-        convertedValue =
-                Math.round(convertedValue * 100.0) / 100.0;
 
         return new Length(convertedValue, targetUnit);
     }
 
-    // Optional: readable output
+    // UC-6 methods for Addition
+    public Length add(Length thatLength) {
+
+        if (thatLength == null) {
+            throw new IllegalArgumentException(
+                    "Length to add cannot be null");
+        }
+
+        // Convert both to base unit (inches)
+        double sumInBase =
+                this.convertToBaseUnit()
+              + thatLength.convertToBaseUnit();
+
+        // Convert sum back to THIS unit
+        double resultValue =
+                sumInBase / this.unit.getConversionFactor();
+
+        return new Length(resultValue, this.unit);
+    }
+
+    // ---------------- TO STRING ----------------
     @Override
     public String toString() {
         return value + " " + unit;
