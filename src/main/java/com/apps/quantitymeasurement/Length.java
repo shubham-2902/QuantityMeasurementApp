@@ -6,11 +6,13 @@ public class Length {
     private double value;
     private LengthUnit unit;
 
-    // Enum for units (base unit = inches)
+    // ===== ENUM WITH ALL UNITS =====
     public enum LengthUnit {
 
-        FEET(12.0),
-        INCHES(1.0);
+        FEET(12.0),        // 1 ft = 12 in
+        INCHES(1.0),       // base unit
+        YARDS(36.0),       // 1 yd = 36 in
+        CENTIMETERS(0.393701); // 1 cm = 0.393701 in
 
         private final double conversionFactor;
 
@@ -29,12 +31,16 @@ public class Length {
         this.unit = unit;
     }
 
-    // Convert to base unit (inches)
+    // Convert to base unit 
     private double convertToBaseUnit() {
-        return value * unit.getConversionFactor();
+
+        double baseValue = value * unit.getConversionFactor();
+
+        // Round to 2 decimal places
+        return Math.round(baseValue * 100.0) / 100.0;
     }
 
-    // Compare two Length objects
+    // Compare method
     public boolean compare(Length thatLength) {
         return Double.compare(
                 this.convertToBaseUnit(),
@@ -42,7 +48,7 @@ public class Length {
         ) == 0;
     }
 
-    // Override equals()
+    // equals override
     @Override
     public boolean equals(Object obj) {
 
@@ -51,7 +57,6 @@ public class Length {
         if (getClass() != obj.getClass()) return false;
 
         Length other = (Length) obj;
-
         return compare(other);
     }
 }
