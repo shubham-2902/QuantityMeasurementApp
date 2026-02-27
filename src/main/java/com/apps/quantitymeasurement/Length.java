@@ -70,6 +70,7 @@ public class Length {
     private boolean compare(Length other) {
 
         double base1 = unit.convertToBaseUnit(value);
+        
         double base2 = other.unit.convertToBaseUnit(other.value);
 
         return Math.abs(base1 - base2) < 1e-4;
