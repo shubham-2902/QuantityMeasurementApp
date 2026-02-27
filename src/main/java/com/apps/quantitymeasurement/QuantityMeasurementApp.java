@@ -2,91 +2,61 @@ package com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    
-    // EQUALITY DEMO
-    
     public static boolean demonstrateLengthEquality(
-            Length length1, Length length2) {
+            Length l1, Length l2) {
 
-        boolean result = length1.equals(length2);
-
-        if (result)
-            System.out.println("The two length measurements are equal.");
-        else
-            System.out.println("The two length measurements are not equal.");
-
-        return result;
+        return l1.equals(l2);
     }
 
-   
-    // COMPARISON USING VALUES
-    
     public static boolean demonstrateLengthComparison(
-            double value1, Length.LengthUnit unit1,
-            double value2, Length.LengthUnit unit2) {
+            double v1, LengthUnit u1,
+            double v2, LengthUnit u2) {
 
-        Length l1 = new Length(value1, unit1);
-        Length l2 = new Length(value2, unit2);
+        Length l1 = new Length(v1, u1);
+        Length l2 = new Length(v2, u2);
 
-        return demonstrateLengthEquality(l1, l2);
+        return l1.equals(l2);
     }
 
-    
-    // CONVERSION DEMO
-    
     public static Length demonstrateLengthConversion(
             double value,
-            Length.LengthUnit fromUnit,
-            Length.LengthUnit toUnit) {
+            LengthUnit from,
+            LengthUnit to) {
 
-        Length length = new Length(value, fromUnit);
-        return length.convertTo(toUnit);
+        Length l = new Length(value, from);
+        return l.convertTo(to);
     }
 
     public static Length demonstrateLengthConversion(
             Length length,
-            Length.LengthUnit toUnit) {
+            LengthUnit toUnit) {
 
         return length.convertTo(toUnit);
     }
 
-  
-    // UC6 ADDITION DEMO
-    
     public static Length demonstrateLengthAddition(
-            Length length1, Length length2) {
+            Length l1,
+            Length l2) {
 
-        Length result = length1.add(length2);
-
-        System.out.println("Sum = " + result);
-
-        return result;
+        return l1.add(l2);
     }
 
-   
-    // UC7 ADDITION WITH TARGET UNIT ⭐
-  
     public static Length demonstrateLengthAddition(
-            Length length1,
-            Length length2,
-            Length.LengthUnit targetUnit) {
+            Length l1,
+            Length l2,
+            LengthUnit targetUnit) {
 
-        Length result = length1.add(length2, targetUnit);
-
-        System.out.println("Sum = " + result);
-
-        return result;
+        return l1.add(l2, targetUnit);
     }
 
-    
-    // MAIN METHOD 
-    
     public static void main(String[] args) {
 
-        Length l1 = new Length(1.0, Length.LengthUnit.FEET);
-        Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
+        Length l1 = new Length(1.0, LengthUnit.FEET);
+        Length l2 = new Length(12.0, LengthUnit.INCHES);
 
-        demonstrateLengthAddition(l1, l2); // UC6
-        demonstrateLengthAddition(l1, l2, Length.LengthUnit.YARDS); // UC7
+        Length result = demonstrateLengthAddition(
+                l1, l2, LengthUnit.FEET);
+
+        System.out.println("Result = " + result);
     }
 }
