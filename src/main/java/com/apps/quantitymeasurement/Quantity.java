@@ -25,7 +25,29 @@ public class Quantity<U extends IMeasurable> {
         return unit;
     }
 
-    // Convert to target unit
+    // ===============================
+    // EQUALITY
+    // ===============================
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) return true;
+        if (!(obj instanceof Quantity<?> other)) return false;
+
+        if (!unit.getClass().equals(other.unit.getClass()))
+            return false;
+
+        double base1 = unit.convertToBaseUnit(value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        return Math.abs(base1 - base2) < 1e-6;
+    }
+
+    // ===============================
+    // CONVERSION
+    // ===============================
+
     public Quantity<U> convertTo(U targetUnit) {
 
         if (targetUnit == null)
@@ -37,67 +59,102 @@ public class Quantity<U extends IMeasurable> {
         return new Quantity<>(converted, targetUnit);
     }
 
-    //  Add → result in THIS unit
+    // ===============================
+    // ADDITION
+    // ===============================
+
     public Quantity<U> add(Quantity<U> other) {
 
-        if (other == null)
-            throw new IllegalArgumentException("Other quantity cannot be null");
+        validate(other);
 
-        if (!unit.getClass().equals(other.unit.getClass()))
-            throw new IllegalArgumentException("Incompatible unit categories");
+        double sumBase =
+                unit.convertToBaseUnit(value)
+              + other.unit.convertToBaseUnit(other.value);
 
-        double base1 = unit.convertToBaseUnit(value);
-        double base2 = other.unit.convertToBaseUnit(other.value);
-
-        double sumBase = base1 + base2;
         double result = unit.convertFromBaseUnit(sumBase);
 
         return new Quantity<>(result, unit);
     }
-    //  Add → result in TARGET unit
+
     public Quantity<U> add(Quantity<U> other, U targetUnit) {
 
-        if (other == null || targetUnit == null)
-            throw new IllegalArgumentException("Invalid arguments");
+        validate(other);
 
-        if (!unit.getClass().equals(other.unit.getClass()))
-            throw new IllegalArgumentException("Incompatible unit categories");
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit null");
 
-        double base1 = unit.convertToBaseUnit(value);
-        double base2 = other.unit.convertToBaseUnit(other.value);
+        double sumBase =
+                unit.convertToBaseUnit(value)
+              + other.unit.convertToBaseUnit(other.value);
 
-        double sumBase = base1 + base2;
         double result = targetUnit.convertFromBaseUnit(sumBase);
 
         return new Quantity<>(result, targetUnit);
     }
 
-    // Compare values in base unit
+    // ===============================
+    // SUBTRACTION (UC12)
+    // ===============================
     
-    private boolean compare(Quantity<U> other) {
 
-        double base1 = unit.convertToBaseUnit(value);
-        double base2 = other.unit.convertToBaseUnit(other.value);
+    public Quantity<U> subtract(Quantity<U> other) {
 
-        return Math.abs(base1 - base2) < 1e-6;
+        validate(other);
+
+        double diffBase =
+                unit.convertToBaseUnit(value)
+              - other.unit.convertToBaseUnit(other.value);
+
+        double result = unit.convertFromBaseUnit(diffBase);
+
+        return new Quantity<>(result, unit);
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
 
-        if (this == obj) return true;
-        if (!(obj instanceof Quantity<?>)) return false;
+        validate(other);
 
-        Quantity<?> other = (Quantity<?>) obj;
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit null");
 
-        //  Prevent cross-category comparison
-        if (this.unit.getClass() != other.unit.getClass())
-            return false;
+        double diffBase =
+                unit.convertToBaseUnit(value)
+              - other.unit.convertToBaseUnit(other.value);
 
-        @SuppressWarnings("unchecked")
-        Quantity<U> casted = (Quantity<U>) other;
+        double result = targetUnit.convertFromBaseUnit(diffBase);
 
-        return compare(casted);
+        return new Quantity<>(result, targetUnit);
+    }
+
+    // ===============================
+    // DIVISION (UC12)
+    // ===============================
+
+    public double divide(Quantity<U> other) {
+
+        validate(other);
+
+        double divisorBase = other.unit.convertToBaseUnit(other.value);
+
+        if (Math.abs(divisorBase) < 1e-12)
+            throw new ArithmeticException("Division by zero");
+
+        double dividendBase = unit.convertToBaseUnit(value);
+
+        return dividendBase / divisorBase;
+    }
+
+    // ===============================
+    // VALIDATION
+    // ===============================
+
+    private void validate(Quantity<U> other) {
+
+        if (other == null)
+            throw new IllegalArgumentException("Quantity null");
+
+        if (!unit.getClass().equals(other.unit.getClass()))
+            throw new IllegalArgumentException("Different categories");
     }
 
     @Override
