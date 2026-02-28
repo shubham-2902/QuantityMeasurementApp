@@ -1,3 +1,4 @@
+
 package com.apps.quantitymeasurement;
 
 public enum LengthUnit implements IMeasurable {
@@ -11,22 +12,27 @@ public enum LengthUnit implements IMeasurable {
 
     LengthUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
-        
     }
 
     @Override
     public double getConversionFactor() {
-    	
         return conversionFactor;
     }
 
     @Override
     public double convertToBaseUnit(double value) {
-        return value * conversionFactor;
+        double result = value * conversionFactor;
+        return Math.round(result * 100.0) / 100.0;
     }
 
     @Override
     public double convertFromBaseUnit(double baseValue) {
-        return Math.round((baseValue / conversionFactor) * 100.0) / 100.0;
+        double result = baseValue / conversionFactor;
+        return Math.round(result * 100.0) / 100.0;
+    }
+
+    @Override
+    public String getUnitName() {
+        return this.name();
     }
 }
