@@ -1,3 +1,4 @@
+
 package com.apps.quantitymeasurement;
 
 public enum WeightUnit implements IMeasurable {
@@ -8,10 +9,8 @@ public enum WeightUnit implements IMeasurable {
     POUND(453.592),
     TONNE(1_000_000.0);
 
-    private final double conversionFactor;
+    private final double conversionFactor; // conversion to base (grams)
 
-    
-    
     WeightUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
@@ -23,11 +22,18 @@ public enum WeightUnit implements IMeasurable {
 
     @Override
     public double convertToBaseUnit(double value) {
-        return value * conversionFactor;
+        double result = value * conversionFactor; // to grams
+        return Math.round(result * 100.0) / 100.0; // round
     }
 
     @Override
     public double convertFromBaseUnit(double baseValue) {
-        return Math.round((baseValue / conversionFactor) * 100.0) / 100.0;
+        double result = baseValue / conversionFactor; // from grams
+        return Math.round(result * 100.0) / 100.0; // round
+    }
+
+    @Override
+    public String getUnitName() {
+        return this.name(); // unit name
     }
 }
