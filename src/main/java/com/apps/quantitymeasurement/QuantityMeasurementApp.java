@@ -60,5 +60,12 @@ public class QuantityMeasurementApp {
         Quantity<WeightUnit> sumWeight =
                 demonstrateAddition(w1, w2, WeightUnit.KILOGRAM);
         System.out.println("Sum: "+ sumWeight);
+        Quantity<VolumeUnit> v1 = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v2 = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+
+        System.out.println(v1.equals(v2));   // true
+        System.out.println(v1.convertTo(VolumeUnit.GALLON));
+        System.out.println(v1.add(v2));
     }
+    
 }
