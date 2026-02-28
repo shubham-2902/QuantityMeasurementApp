@@ -101,5 +101,12 @@ public class QuantityMeasurementApp {
 
         System.out.println(demonstrateSubtraction(v4, v5));
         System.out.println(demonstrateDivision(v4, new Quantity<>(10.0, VolumeUnit.LITRE)));
+        
+        Quantity<TemperatureUnit> t1 = new Quantity<>(5.0, TemperatureUnit.FAHRENHEIT);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(215.0, TemperatureUnit.CELSIUS);
+        
+        
+        System.out.println(demonstrateSubtraction(t1, t2));
+        System.out.println(demonstrateDivision(t2, new Quantity<>(10.0, TemperatureUnit.KELVIN)));
     }
 }
