@@ -73,6 +73,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     // Compare values in base unit
+    
     private boolean compare(Quantity<U> other) {
 
         double base1 = unit.convertToBaseUnit(value);
