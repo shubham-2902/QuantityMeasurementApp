@@ -1,7 +1,8 @@
 package com.apps.quantitymeasurement.service;
 
 import com.apps.quantitymeasurement.core.*;
-import com.apps.quantitymeasurement.model.*;
+import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
+import com.apps.quantitymeasurement.model.QuantityDTO;
 import com.apps.quantitymeasurement.repository.IQuantityMeasurementRepository;
 
 public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
@@ -20,7 +21,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         return new Quantity<>(dto.value, unit);
     }
 
-    // Convert DTO Unit → Core Unit
+    // Convert DTO unit → Core unit
     private IMeasurable getCoreUnit(QuantityDTO.IMeasurableUnit dtoUnit) {
 
         String name = dtoUnit.getUnitName();
@@ -41,16 +42,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
             if (u.getUnitName().equalsIgnoreCase(name))
                 return u;
 
-        throw new IllegalArgumentException("Invalid unit: " + name);
-    }
-
-    // Convert core Quantity → DTO
-    private QuantityDTO toDTO(Quantity<IMeasurable> quantity) {
-
-        return new QuantityDTO(
-                quantity.getValue(),
-                QuantityDTO.LengthUnit.valueOf(quantity.getUnit().getUnitName())
-        );
+        throw new QuantityMeasurementException("Invalid unit: " + name);
     }
 
     @Override
@@ -59,16 +51,13 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         Quantity<IMeasurable> quantity1 = toQuantity(q1);
         Quantity<IMeasurable> quantity2 = toQuantity(q2);
 
-        boolean result = quantity1.equals(quantity2);
-
-        return result;
+        return quantity1.equals(quantity2);
     }
 
     @Override
     public QuantityDTO convert(QuantityDTO quantityDTO, QuantityDTO.IMeasurableUnit targetUnit) {
 
         Quantity<IMeasurable> quantity = toQuantity(quantityDTO);
-
         IMeasurable coreTargetUnit = getCoreUnit(targetUnit);
 
         Quantity<IMeasurable> result = quantity.convertTo(coreTargetUnit);
