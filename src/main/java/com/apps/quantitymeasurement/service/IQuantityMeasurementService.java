@@ -1,12 +1,12 @@
 package com.apps.quantitymeasurement.service;
 
-import com.apps.quantitymeasurement.model.QuantityDTO;
+import com.apps.quantitymeasurement.dto.QuantityDTO;
 
 public interface IQuantityMeasurementService {
 
-    boolean compare(QuantityDTO q1, QuantityDTO q2);
+    QuantityDTO convert(QuantityDTO input, String targetUnit);
 
-    QuantityDTO convert(QuantityDTO quantity, QuantityDTO.IMeasurableUnit targetUnit);
+    boolean compare(QuantityDTO q1, QuantityDTO q2);
 
     QuantityDTO add(QuantityDTO q1, QuantityDTO q2);
 

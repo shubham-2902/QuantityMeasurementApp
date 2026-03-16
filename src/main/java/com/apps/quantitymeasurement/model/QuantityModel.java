@@ -1,18 +1,17 @@
 package com.apps.quantitymeasurement.model;
 
+
+
 import com.apps.quantitymeasurement.core.IMeasurable;
 
-/**
- * Internal POJO used inside service layer
- */
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class QuantityModel<U extends IMeasurable> {
 
-    public double value;
-    public U unit;
-
-    public QuantityModel(double value, U unit) {
-        this.value = value;
-        this.unit = unit;
-    }
+    private double value;
+    private U unit;
 
 }

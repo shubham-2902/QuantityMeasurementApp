@@ -1,37 +1,38 @@
 package com.apps.quantitymeasurement.core;
 
-import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
+/*
+ * UC14 Enhancements:
+ * Adds optional arithmetic capability support.
+ * Existing units remain fully compatible.
+ */
 
-// Common contract for all measurable units
 public interface IMeasurable {
 
-    // Conversion factor relative to base unit
-    double getConversionFactor();
-
-    // Convert value to base unit
-    double convertToBaseUnit(double value);
-
-    // Convert from base unit to this unit
-    double convertFromBaseUnit(double baseValue);
-
-    // Name of the unit
+    // ===== EXISTING REQUIRED METHODS (UNCHANGED) =====
     String getUnitName();
 
-    // Measurement category (Length, Weight, Volume, Temperature)
-    default String getMeasurementType() {
-        return this.getClass().getSimpleName();
+    double getConversionFactor();
+
+    double convertToBaseUnit(double value);
+
+    double convertFromBaseUnit(double baseValue);
+
+
+    // ===== NEW UC14 ADDITIONS =====
+
+    // default lambda → all units support arithmetic by default
+    SupportsArithmetic supportsArithmetic = () -> true;
+
+    // default method → existing units inherit TRUE
+    default boolean supportsArithmetic() {
+        return supportsArithmetic.isSupported();
     }
 
-    // By default arithmetic is supported
-    default SupportsArithmetic supportsArithmetic() {
-        return () -> true;
-    }
-
-    // Validate if arithmetic operation is allowed
+    /*
+     * Default validation method.
+     * Units that do NOT support arithmetic (Temperature) will override this.
+     */
     default void validateOperationSupport(String operation) {
-        if (!supportsArithmetic().isSupported()) {
-            throw new QuantityMeasurementException(
-                    operation + " not supported for unit: " + getUnitName());
-        }
+        // do nothing by default
     }
 }

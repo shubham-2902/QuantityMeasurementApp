@@ -1,8 +1,12 @@
 package com.apps.quantitymeasurement.service;
 
-import com.apps.quantitymeasurement.core.*;
-import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
-import com.apps.quantitymeasurement.model.QuantityDTO;
+import com.apps.quantitymeasurement.core.LengthUnit;
+import com.apps.quantitymeasurement.core.Quantity;
+import com.apps.quantitymeasurement.core.TemperatureUnit;
+import com.apps.quantitymeasurement.core.VolumeUnit;
+import com.apps.quantitymeasurement.core.WeightUnit;
+import com.apps.quantitymeasurement.dto.QuantityDTO;
+import com.apps.quantitymeasurement.entity.QuantityMeasurementEntity;
 import com.apps.quantitymeasurement.repository.IQuantityMeasurementRepository;
 
 public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
@@ -13,86 +17,157 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         this.repository = repository;
     }
 
-    // Convert DTO → Core Quantity
-    private Quantity<IMeasurable> toQuantity(QuantityDTO dto) {
+    // Convert DTO -> Quantity object
+    private Quantity<?> createQuantity(QuantityDTO dto) {
 
-        IMeasurable unit = getCoreUnit(dto.unit);
+        try {
+            LengthUnit unit = LengthUnit.valueOf(dto.getUnit());
+            return new Quantity<>(dto.getValue(), unit);
+        } catch (Exception ignored) {}
 
-        return new Quantity<>(dto.value, unit);
+        try {
+            WeightUnit unit = WeightUnit.valueOf(dto.getUnit());
+            return new Quantity<>(dto.getValue(), unit);
+        } catch (Exception ignored) {}
+
+        try {
+            VolumeUnit unit = VolumeUnit.valueOf(dto.getUnit());
+            return new Quantity<>(dto.getValue(), unit);
+        } catch (Exception ignored) {}
+
+        try {
+            TemperatureUnit unit = TemperatureUnit.valueOf(dto.getUnit());
+            return new Quantity<>(dto.getValue(), unit);
+        } catch (Exception ignored) {}
+
+        throw new IllegalArgumentException("Unsupported Unit: " + dto.getUnit());
     }
 
-    // Convert DTO unit → Core unit
-    private IMeasurable getCoreUnit(QuantityDTO.IMeasurableUnit dtoUnit) {
-
-        String name = dtoUnit.getUnitName();
-
-        for (LengthUnit u : LengthUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
-
-        for (WeightUnit u : WeightUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
-
-        for (VolumeUnit u : VolumeUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
-
-        for (TemperatureUnit u : TemperatureUnit.values())
-            if (u.getUnitName().equalsIgnoreCase(name))
-                return u;
-
-        throw new QuantityMeasurementException("Invalid unit: " + name);
-    }
+    // ================= COMPARE =================
 
     @Override
     public boolean compare(QuantityDTO q1, QuantityDTO q2) {
 
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
+        Quantity<?> quantity1 = createQuantity(q1);
+        Quantity<?> quantity2 = createQuantity(q2);
 
         return quantity1.equals(quantity2);
     }
 
+    // ================= CONVERT =================
+
     @Override
-    public QuantityDTO convert(QuantityDTO quantityDTO, QuantityDTO.IMeasurableUnit targetUnit) {
+    public QuantityDTO convert(QuantityDTO input, String targetUnit) {
 
-        Quantity<IMeasurable> quantity = toQuantity(quantityDTO);
-        IMeasurable coreTargetUnit = getCoreUnit(targetUnit);
+        Quantity<?> quantity = createQuantity(input);
 
-        Quantity<IMeasurable> result = quantity.convertTo(coreTargetUnit);
+        Object unit = quantity.getUnit();
 
-        return new QuantityDTO(result.getValue(), targetUnit);
+        if (unit instanceof LengthUnit) {
+
+            LengthUnit target = LengthUnit.valueOf(targetUnit);
+            Quantity<LengthUnit> result =
+                    ((Quantity<LengthUnit>) quantity).convertTo(target);
+
+            return new QuantityDTO(result.getValue(), result.getUnit().name());
+        }
+
+        if (unit instanceof WeightUnit) {
+
+            WeightUnit target = WeightUnit.valueOf(targetUnit);
+            Quantity<WeightUnit> result =
+                    ((Quantity<WeightUnit>) quantity).convertTo(target);
+
+            return new QuantityDTO(result.getValue(), result.getUnit().name());
+        }
+
+        if (unit instanceof VolumeUnit) {
+
+            VolumeUnit target = VolumeUnit.valueOf(targetUnit);
+            Quantity<VolumeUnit> result =
+                    ((Quantity<VolumeUnit>) quantity).convertTo(target);
+
+            return new QuantityDTO(result.getValue(), result.getUnit().name());
+        }
+
+        if (unit instanceof TemperatureUnit) {
+
+            TemperatureUnit target = TemperatureUnit.valueOf(targetUnit);
+            Quantity<TemperatureUnit> result =
+                    ((Quantity<TemperatureUnit>) quantity).convertTo(target);
+
+            return new QuantityDTO(result.getValue(), result.getUnit().name());
+        }
+
+        throw new IllegalArgumentException("Unsupported unit type");
     }
+
+    // ================= ADD =================
 
     @Override
     public QuantityDTO add(QuantityDTO q1, QuantityDTO q2) {
 
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
+        Quantity<?> quantity1 = createQuantity(q1);
+        Quantity<?> quantity2 = createQuantity(q2);
 
-        Quantity<IMeasurable> result = quantity1.add(quantity2);
+        Quantity result = ((Quantity) quantity1).add((Quantity) quantity2);
 
-        return new QuantityDTO(result.getValue(), q1.unit);
+        repository.saveMeasurement(
+                new QuantityMeasurementEntity(
+                        "ADD",
+                        quantity1.toString(),
+                        quantity2.toString(),
+                        result.toString(),
+                        null
+                )
+        );
+
+        return new QuantityDTO(result.getValue(), result.getUnit().toString());
     }
+
+    // ================= SUBTRACT =================
 
     @Override
     public QuantityDTO subtract(QuantityDTO q1, QuantityDTO q2) {
 
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
+        Quantity<?> quantity1 = createQuantity(q1);
+        Quantity<?> quantity2 = createQuantity(q2);
 
-        Quantity<IMeasurable> result = quantity1.subtract(quantity2);
+        Quantity result = ((Quantity) quantity1).subtract((Quantity) quantity2);
 
-        return new QuantityDTO(result.getValue(), q1.unit);
+        repository.saveMeasurement(
+                new QuantityMeasurementEntity(
+                        "SUBTRACT",
+                        quantity1.toString(),
+                        quantity2.toString(),
+                        result.toString(),
+                        null
+                )
+        );
+
+        return new QuantityDTO(result.getValue(), result.getUnit().toString());
     }
+
+    // ================= DIVIDE =================
 
     @Override
     public double divide(QuantityDTO q1, QuantityDTO q2) {
 
-        Quantity<IMeasurable> quantity1 = toQuantity(q1);
-        Quantity<IMeasurable> quantity2 = toQuantity(q2);
+        Quantity<?> quantity1 = createQuantity(q1);
+        Quantity<?> quantity2 = createQuantity(q2);
 
-        return quantity1.divide(quantity2);
+        double result = ((Quantity) quantity1).divide((Quantity) quantity2);
+
+        repository.saveMeasurement(
+                new QuantityMeasurementEntity(
+                        "DIVIDE",
+                        quantity1.toString(),
+                        quantity2.toString(),
+                        String.valueOf(result),
+                        null
+                )
+        );
+
+        return result;
     }
 }

@@ -2,7 +2,6 @@ package com.apps.quantitymeasurement;
 
 import org.junit.jupiter.api.Test;
 
-
 import com.apps.quantitymeasurement.core.LengthUnit;
 import com.apps.quantitymeasurement.core.Quantity;
 import com.apps.quantitymeasurement.core.TemperatureUnit;
