@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # 1. THE DATABASE
+  mysql:
+    image: mysql:8
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: RadheRadhe
+      MYSQL_DATABASE: quantity_auth_db
+    ports:
+      - "3307:3306"
+    networks:
+      - microservices-network
+
+  # 2. EUREKA SERVER (The address book)
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    networks:
+      - microservices-network
+
+  # 3. API GATEWAY (The Front Door)
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - EUREKA_INSTANCE_HOSTNAME=api-gateway
+    depends_on:
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # 4. AUTH SERVICE (Login / Security)
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/quantity_auth_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - EUREKA_INSTANCE_HOSTNAME=auth-service
+    depends_on:
+      - eureka-server
+      - mysql
+    networks:
+      - microservices-network
+
+  # 5. QUANTITY SERVICE (Core Logic)
+  quantity-service:
+    build: ./quantity-service
+    container_name: quantity-service
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - EUREKA_INSTANCE_HOSTNAME=quantity-service
+    depends_on:
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # 6. HISTORY SERVICE (Database logging)
+  history-service:
+    build: ./history-service
+    container_name: history-service
+    ports:
+      - "8083:8083"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/history_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - EUREKA_INSTANCE_HOSTNAME=history-service
+    depends_on:
+      - eureka-server
+      - mysql
+    networks:
+      - microservices-network
+
+  # 7. ADMIN SERVER (Monitoring)
+  admin-server:
+    build: ./admin-server
+    container_name: admin-server
+    ports:
+      - "9090:9090"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - EUREKA_INSTANCE_HOSTNAME=admin-server
+    depends_on:
+      - eureka-server
+    networks:
+      - microservices-network
+
+# Connect them all via a virtual private network
+networks:
+  microservices-network:
+    driver: bridge

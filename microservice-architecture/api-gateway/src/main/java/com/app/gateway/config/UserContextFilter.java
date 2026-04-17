@@ -17,7 +17,7 @@ public class UserContextFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         
-        // Extract token from Cookie
+        // Extract token from Cookie or Authorization header
         String token = null;
         String cookieHeader = request.getHeaders().getFirst("Cookie");
         if (cookieHeader != null) {
@@ -25,6 +25,14 @@ public class UserContextFilter implements GlobalFilter, Ordered {
             Matcher matcher = tokenPattern.matcher(cookieHeader);
             if (matcher.find()) {
                 token = matcher.group(1);
+            }
+        }
+        
+        // Fallback to Authorization header
+        if (token == null) {
+            String authHeader = request.getHeaders().getFirst("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
             }
         }
         

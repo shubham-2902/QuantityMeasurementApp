@@ -1,6 +1,6 @@
 server:
   port: 8081
-  address: 127.0.0.1
+  forward-headers-strategy: native
 
 spring:
   application:
@@ -27,6 +27,7 @@ spring:
             scope:
               - email
               - profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 
 eureka:
   client:
